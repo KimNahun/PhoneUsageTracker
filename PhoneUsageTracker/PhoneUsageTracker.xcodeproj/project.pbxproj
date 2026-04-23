@@ -6,14 +6,65 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */; };
+		DE81DCED2F9A63BE0045FDC5 /* UsageReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DE81DCFE2F9A67880045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFD2F9A67880045FDC5 /* PersonalColorDesignSystem */; };
+		DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFF2F9A69890045FDC5 /* PersonalColorDesignSystem */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DE81DCEB2F9A63BE0045FDC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DE81DCAA2F9A5FF20045FDC5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DE81DCE12F9A63BE0045FDC5;
+			remoteInfo = UsageReportExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DE81DCF22F9A63BE0045FDC5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DE81DCED2F9A63BE0045FDC5 /* UsageReportExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		DE81DCB22F9A5FF20045FDC5 /* PhoneUsageTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoneUsageTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UsageReportExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DE81DCEE2F9A63BE0045FDC5 /* Exceptions for "UsageReportExtension" folder in "UsageReportExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DE81DCE12F9A63BE0045FDC5 /* UsageReportExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DE81DCB42F9A5FF20045FDC5 /* PhoneUsageTracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PhoneUsageTracker;
+			sourceTree = "<group>";
+		};
+		DE81DCE62F9A63BE0045FDC5 /* UsageReportExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DE81DCEE2F9A63BE0045FDC5 /* Exceptions for "UsageReportExtension" folder in "UsageReportExtension" target */,
+			);
+			path = UsageReportExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +74,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE81DCFE2F9A67880045FDC5 /* PersonalColorDesignSystem in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE81DCDF2F9A63BE0045FDC5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */,
+				DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				DE81DCB42F9A5FF20045FDC5 /* PhoneUsageTracker */,
+				DE81DCE62F9A63BE0045FDC5 /* UsageReportExtension */,
+				DE81DCE32F9A63BE0045FDC5 /* Frameworks */,
 				DE81DCB32F9A5FF20045FDC5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +104,17 @@
 			isa = PBXGroup;
 			children = (
 				DE81DCB22F9A5FF20045FDC5 /* PhoneUsageTracker.app */,
+				DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DE81DCE32F9A63BE0045FDC5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,20 +127,46 @@
 				DE81DCAE2F9A5FF20045FDC5 /* Sources */,
 				DE81DCAF2F9A5FF20045FDC5 /* Frameworks */,
 				DE81DCB02F9A5FF20045FDC5 /* Resources */,
+				DE81DCF22F9A63BE0045FDC5 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				DE81DCEC2F9A63BE0045FDC5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				DE81DCB42F9A5FF20045FDC5 /* PhoneUsageTracker */,
 			);
 			name = PhoneUsageTracker;
 			packageProductDependencies = (
+				DE81DCFD2F9A67880045FDC5 /* PersonalColorDesignSystem */,
 			);
 			productName = PhoneUsageTracker;
 			productReference = DE81DCB22F9A5FF20045FDC5 /* PhoneUsageTracker.app */;
 			productType = "com.apple.product-type.application";
+		};
+		DE81DCE12F9A63BE0045FDC5 /* UsageReportExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DE81DCEF2F9A63BE0045FDC5 /* Build configuration list for PBXNativeTarget "UsageReportExtension" */;
+			buildPhases = (
+				DE81DCDE2F9A63BE0045FDC5 /* Sources */,
+				DE81DCDF2F9A63BE0045FDC5 /* Frameworks */,
+				DE81DCE02F9A63BE0045FDC5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DE81DCE62F9A63BE0045FDC5 /* UsageReportExtension */,
+			);
+			name = UsageReportExtension;
+			packageProductDependencies = (
+				DE81DCFF2F9A69890045FDC5 /* PersonalColorDesignSystem */,
+			);
+			productName = UsageReportExtension;
+			productReference = DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -83,6 +181,9 @@
 					DE81DCB12F9A5FF20045FDC5 = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
+					DE81DCE12F9A63BE0045FDC5 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 				};
 			};
 			buildConfigurationList = DE81DCAD2F9A5FF20045FDC5 /* Build configuration list for PBXProject "PhoneUsageTracker" */;
@@ -94,18 +195,29 @@
 			);
 			mainGroup = DE81DCA92F9A5FF20045FDC5;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DE81DCFC2F9A67880045FDC5 /* XCRemoteSwiftPackageReference "PersonalColorDesignSystem" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DE81DCB32F9A5FF20045FDC5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				DE81DCB12F9A5FF20045FDC5 /* PhoneUsageTracker */,
+				DE81DCE12F9A63BE0045FDC5 /* UsageReportExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DE81DCB02F9A5FF20045FDC5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE81DCE02F9A63BE0045FDC5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +234,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DE81DCDE2F9A63BE0045FDC5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DE81DCEC2F9A63BE0045FDC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DE81DCE12F9A63BE0045FDC5 /* UsageReportExtension */;
+			targetProxy = DE81DCEB2F9A63BE0045FDC5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		DE81DCBB2F9A5FF50045FDC5 /* Debug */ = {
@@ -178,7 +305,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -236,7 +363,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -251,6 +378,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PhoneUsageTracker/PhoneUsageTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AHW642SXDF;
@@ -273,7 +401,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -283,6 +411,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PhoneUsageTracker/PhoneUsageTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AHW642SXDF;
@@ -303,6 +432,64 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DE81DCF02F9A63BE0045FDC5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UsageReportExtension/UsageReportExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AHW642SXDF;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UsageReportExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = UsageReportExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nahun.PhoneUsageTracker.UsageReportExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DE81DCF12F9A63BE0045FDC5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UsageReportExtension/UsageReportExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AHW642SXDF;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UsageReportExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = UsageReportExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nahun.PhoneUsageTracker.UsageReportExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -331,7 +518,40 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		DE81DCEF2F9A63BE0045FDC5 /* Build configuration list for PBXNativeTarget "UsageReportExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE81DCF02F9A63BE0045FDC5 /* Debug */,
+				DE81DCF12F9A63BE0045FDC5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DE81DCFC2F9A67880045FDC5 /* XCRemoteSwiftPackageReference "PersonalColorDesignSystem" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/KimNahun/PersonalColorDesignSystem.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DE81DCFD2F9A67880045FDC5 /* PersonalColorDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE81DCFC2F9A67880045FDC5 /* XCRemoteSwiftPackageReference "PersonalColorDesignSystem" */;
+			productName = PersonalColorDesignSystem;
+		};
+		DE81DCFF2F9A69890045FDC5 /* PersonalColorDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE81DCFC2F9A67880045FDC5 /* XCRemoteSwiftPackageReference "PersonalColorDesignSystem" */;
+			productName = PersonalColorDesignSystem;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DE81DCAA2F9A5FF20045FDC5 /* Project object */;
 }

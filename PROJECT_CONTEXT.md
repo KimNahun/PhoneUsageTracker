@@ -31,9 +31,8 @@ iOS Screen Time 데이터를 분석해 사용자가 **언제, 어떤 앱을, 얼
 - **번들 ID**: com.nahun.PhoneUsageTracker
 - **Extension 번들 ID**: com.nahun.PhoneUsageTracker.UsageReport
 - **App Group ID**: group.com.nahun.PhoneUsageTracker
-- **최소 타겟 iOS**: 26.1 (현재 프로젝트 설정값 그대로)
-- **Swift 버전**: Swift 6 (엄격 동시성 필수)
-  - ⚠️ 현재 프로젝트는 Swift 5.0 으로 설정됨. **Build Settings → Swift Language Version → Swift 6** 으로 변경 필요
+- **최소 타겟 iOS**: 17.0
+- **Swift 버전**: Swift 6 (엄격 동시성 필수) — **설정 완료**
 - **UI 프레임워크**: SwiftUI + Swift Charts
 
 ---
@@ -107,21 +106,20 @@ HARNESS_ROOT="/Users/kimnahun/Desktop/Side-Project/PhoneUsageTracker"
 ```bash
 BUILD_COMMAND="xcodebuild -project $PROJECT_ROOT/PhoneUsageTracker.xcodeproj \
   -scheme PhoneUsageTracker \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   build 2>&1 | grep -E 'error:|BUILD (SUCCEEDED|FAILED)'"
 
 TEST_COMMAND="xcodebuild test -project $PROJECT_ROOT/PhoneUsageTracker.xcodeproj \
   -scheme PhoneUsageTracker \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   2>&1 | tail -5"
 ```
 
 > ⚠️ FamilyControls 권한은 **시뮬레이터에서 동작 불안정**.
 > 시뮬레이터로는 빌드만 검증, 실제 데이터 흐름 테스트는 **실기기 필수**.
 >
-> ⚠️ iOS 26.1 deployment target 이므로 시뮬레이터 OS 도 iOS 26+ 필요.
-> 사용 가능한 시뮬레이터가 없으면 `xcrun simctl list devices` 로 확인 후
-> `name=iPhone 16` 부분을 실제 존재하는 디바이스 이름으로 변경.
+> 시뮬레이터 디바이스 이름은 `xcrun simctl list devices` 로 확인.
+> 현재 환경에 `iPhone 17` 시뮬레이터 존재 확인됨 (iOS 17+ 시뮬레이터면 OK).
 
 ---
 
@@ -298,7 +296,7 @@ UsageReportExtension/
 - 다크 모드 / 라이트 모드 모두 지원
 - Dynamic Type 지원 (Swift Charts 라벨 포함)
 - VoiceOver 라벨 (특히 차트는 `accessibilityLabel` 필수)
-- 색맹 고려: 카테고리 색상은 `.blue/.green/.orange` 등 시스템 색 사용
+- 색맹 고려: 카테고리 색상은 §10 의 `Color.chartPalette` 헬퍼 사용 (액센트 + semantic 색 조합)
 - 차트는 인터랙티브 (탭/드래그 시 값 표시) — Swift Charts `chartOverlay` + `DragGesture`
 - 권한 거절 / 데이터 없음 / 첫 실행 등 **빈 상태 UI 명시적으로 설계**
 
@@ -306,21 +304,111 @@ UsageReportExtension/
 
 ## 10. 디자인 시스템
 
-> 별도 SPM 패키지 없음. **SwiftUI semantic color / font 만 사용.**
+> **`PersonalColorDesignSystem` SPM 패키지 사용.**
+> 패키지 위치: `/Users/kimnahun/Desktop/Side-Project/PersonalColorDesignSystem`
+> 메인 앱 + Extension 양쪽 타겟에 Local SPM Package 로 추가 필요.
+> Generator 는 아래 실제 API 만 사용 — 임의 토큰 만들지 마라.
 
 ```swift
-// 색상
-Color.primary, .secondary, .accentColor
-Color(.systemBackground), Color(.secondarySystemBackground)
-
-// 폰트
-.font(.largeTitle), .font(.headline), .font(.body)
-
-// 금지
-Color(red:..., green:..., blue:...)   // 하드코딩 금지
+import PersonalColorDesignSystem
 ```
 
-차트 색상은 `Color.accentColor` 기반 + Swift Charts 기본 팔레트.
+### 추가 방법 (Xcode 에서 사용자가 1회)
+1. Xcode → File → Add Package Dependencies...
+2. 좌하단 **Add Local...** 클릭
+3. `/Users/kimnahun/Desktop/Side-Project/PersonalColorDesignSystem` 선택
+4. **메인 앱 (`PhoneUsageTracker`)** 타겟에 추가
+5. 프로젝트 설정 → `UsageReportExtension` 타겟 → General → Frameworks and Libraries → `+` → `PersonalColorDesignSystem` 라이브러리 추가
+
+### 실제 API — 색상 (`Color.p...`)
+
+```swift
+// Accent
+.pAccentPrimary       // soft lavender
+.pAccentSecondary     // soft pink
+
+// Background (다크 톤 그래디언트)
+.pBackgroundTop / .pBackgroundMid / .pBackgroundBottom
+
+// Glass (반투명 카드)
+.pGlassFill / .pGlassBorder / .pGlassSelected
+
+// Text (다크 모드 전제 — 흰색 기반)
+.pTextPrimary         // white
+.pTextSecondary       // white 70%
+.pTextTertiary        // white 50%
+
+// Semantic
+.pSuccess / .pWarning / .pDestructive
+
+// Misc
+.pShadow / .pToastBackground / .pTabBarBackground
+```
+
+### 실제 API — 폰트 (`Font.p...(size)`)
+
+```swift
+.font(.pDisplay(40))      // 큰 숫자 / light
+.font(.pTitle(20))        // 섹션 타이틀 / semibold
+.font(.pBodyMedium(15))   // 강조 본문 / medium
+.font(.pBody(14))         // 본문 / regular
+.font(.pCaption(12))      // 캡션 / regular
+```
+
+### 실제 API — 컴포넌트
+
+```swift
+GlassCard { content }                 // 반투명 카드 컨테이너
+PGradientBackground()                 // 메인 배경 그래디언트 (다크)
+PAccentGradient()                     // 액센트 그래디언트
+HapticManager.impact(.light)          // 햅틱 피드백
+HapticManager.notification(.success)
+ToastData(type:.success, message:"")  // Toast 데이터
+```
+
+### ⚠️ 다크 모드 전제
+
+이 패키지는 **다크 톤 + 라벤더/핑크 액센트** 디자인이다.
+`pTextPrimary = white`, `pBackgroundTop = 어두운 보라` — 라이트 모드에서 부자연스러울 수 있음.
+전체 앱을 `.preferredColorScheme(.dark)` 강제하거나, `PGradientBackground` 를 모든 화면 루트에 배치해 다크 톤 일관성 유지.
+
+### ⚠️ 차트 팔레트 부재 — 직접 매핑
+
+패키지에 `puChart1..8` 같은 차트 전용 팔레트가 없다.
+카테고리별 색상은 아래 매핑을 메인 앱 / Extension 양쪽에 헬퍼로 정의:
+
+```swift
+// AppColorPalette.swift (메인 앱 + Extension 양쪽에 동일하게 둠)
+extension Color {
+    static let chartPalette: [Color] = [
+        .pAccentPrimary,
+        .pAccentSecondary,
+        .pSuccess,
+        .pWarning,
+        .pDestructive,
+        Color(.pAccentPrimary).opacity(0.6),
+        Color(.pAccentSecondary).opacity(0.6),
+        Color(.pSuccess).opacity(0.6),
+    ]
+}
+```
+
+> 8개 카테고리/앱 이상이면 cycle (modulo) 처리.
+
+### 금지
+
+```swift
+// 하드코딩 색상 / 폰트 금지
+Color(red:..., green:..., blue:...)
+.font(.system(size: 17))
+Color.blue                            // semantic 아닌 리터럴
+
+// 패키지 컴포넌트 자체 구현 금지
+struct MyCard: View { ... }           // GlassCard 가 있는데 자체 구현 금지
+
+// 시스템 semantic 색상 직접 사용 자제
+Color(.systemBackground)              // pBackgroundTop 등 패키지 토큰 우선
+```
 
 ---
 
@@ -398,17 +486,11 @@ Color(red:..., green:..., blue:...)   // 하드코딩 금지
 
 ---
 
-## 15. 단계별 구현 우선순위
+## 15. 구현 범위
 
-| 우선순위 | 기능 | 이유 |
-|---------|------|------|
-| P0 | F1 권한 + F2 대시보드 (오늘) | 권한 못 받으면 모든 게 막힘 |
-| P0 | Extension 타겟 + TotalActivityScene | 데이터 표시의 최소 단위 |
-| P1 | F3 앱 순위, F4 카테고리 | 핵심 분석 기능 |
-| P1 | F5 히트맵 | 시간대 패턴 |
-| P2 | F6 장기 추세 (자체 누적) | 데이터 쌓인 후 의미 |
-| P2 | F7 픽업 / 알림 | 부가 정보 |
-| P3 | F8 설정 | 마지막 |
+> **시나리오 1~10 전부 한 번에 구현.**
+> Generator 는 §8 의 F1~F8 + §17 의 시나리오 모두를 포함한 SPEC 으로 코드를 생성한다.
+> 우선순위 잘라내기 없음. Evaluator 는 시나리오 누락 시 즉시 fail.
 
 ---
 
@@ -422,3 +504,114 @@ Color(red:..., green:..., blue:...)   // 하드코딩 금지
 | 첫 실행 직후엔 표시할 데이터 없음 | "잠시 후 다시 확인" 빈 상태 UI |
 | `ApplicationToken` 직렬화 호환성 | App Group 안에서만 사용. 외부 전송 금지 |
 | iOS 버전 업데이트로 API 변경 | 최소 17.0 고정. 18+ 신 API 사용 시 `if #available` 분기 |
+| `PersonalColorDesignSystem` Local Package 미추가 시 빌드 실패 | 사용자가 Xcode 에서 1회 Add Local Package 필요 (§10 참조) |
+| 패키지 색상이 다크 톤 전제 | 앱 전체를 `.preferredColorScheme(.dark)` 로 강제하거나 모든 화면에 `PGradientBackground()` 배치 |
+
+---
+
+## 17. 구현 시나리오 (사용자 관점, 전부 구현 대상)
+
+> 모든 시나리오는 빠짐없이 구현되어야 한다.
+> Evaluator 는 시나리오 누락을 기능 결함으로 간주.
+
+### 시나리오 1 — 최초 실행 (온보딩 + 권한 요청)
+
+- 3단계 온보딩: (1) 앱 소개, (2) 데이터 로컬 저장 안내, (3) Screen Time 권한 안내
+- 배경: `PGradientBackground()`. 카드 컨테이너: `GlassCard`
+- 마지막 단계의 [권한 요청하기] 버튼 → `AuthorizationCenter.shared.requestAuthorization(for: .individual)` 호출
+- 시스템 다이얼로그 응답에 따라 분기:
+  - 허용 → 시나리오 3 으로
+  - 거부 → 시나리오 2 로
+- 한 번 온보딩 완료 시 재실행하지 않음 (UserDefaults 플래그)
+
+### 시나리오 2 — 권한 거절 시 안내
+
+- "권한 없이는 분석할 수 없어요" 안내를 `GlassCard` 안에 표시 (전용 컴포넌트 없음 — 패키지에 없는 건 자체 구현)
+- [설정 열기] 버튼 → `UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)`
+- [다시 시도] 버튼 → `requestAuthorization` 재호출
+- 권한 미부여 동안은 분석 화면 진입 차단
+
+### 시나리오 3 — 권한 받은 직후 빈 상태
+
+- 대시보드 진입했지만 Screen Time 데이터 미수집 상태
+- `GlassCard` 안에 SF Symbol + "데이터 수집 중" 메시지
+- 5분 간격으로 자동 새로고침
+
+### 시나리오 4 — 정상 대시보드 (오늘)
+
+- 상단 SwiftUI `Picker(.segmented)` 스타일 (패키지에 전용 컴포넌트 없음): 오늘 / 이번 주 / 이번 달 / 올해
+- 오늘 총 사용 시간 (`.font(.pDisplay(48))`)
+- **시간대별 막대 차트** (Extension 안 — `DeviceActivityReport(context: .totalActivity, filter:)`)
+  - x축 0~23시
+  - Swift Charts `BarMark`
+- **가장 많이 쓴 앱 Top 3** (Extension 안)
+  - 각 행: `Label(applicationToken)` + 사용 시간 텍스트
+- [전체 앱 보기 →] 링크 → 시나리오 6
+
+### 시나리오 5 — 기간 변경 (주/월/년)
+
+- 세그먼트에서 [이번 주] 선택 시:
+  - 요일별 막대 차트 (월~일)
+  - Top 5 앱
+  - 일 평균 사용 시간
+- [이번 달]: 일별 라인 차트 (1~30/31일)
+- [올해]: 월별 막대 차트 (1~12월)
+  - 자체 누적 데이터 14일 미만이면 `GlassCard` 안에 "데이터 누적 중. 14일 후 활성화" 표시
+- 기간별로 `DeviceActivityFilter.segmentInterval` 분기 (`.hourly` / `.daily` / 자체 누적)
+
+### 시나리오 6 — 앱별 순위 전체 보기
+
+- 별도 화면 (NavigationStack push)
+- 상단 기간 세그먼트 + 카테고리 필터 (전체/소셜/게임/생산성/...)
+- 리스트: 각 행 = `Label(token)` + 사용 시간 + 비율 막대 + 퍼센트
+- 각 행 탭 시 → 그 앱의 시간대별 사용 패턴 detail 화면
+
+### 시나리오 7 — 카테고리 분석
+
+- 도넛 차트 (`SectorMark`)
+- 가운데에 총 시간 표시
+- 범례: `Label(activityCategoryToken)` + 시간 + 퍼센트
+- 색상은 §10 `Color.chartPalette` 순환
+
+### 시나리오 8 — 시간대 히트맵
+
+- 7일 × 24시간 격자 (`RectangleMark`)
+- 셀 색상 강도 = 사용 시간
+- 셀 탭 시 그 시간대 앱 분포 팝업 (`sheet` 또는 `popover`)
+- "💡 가장 많이 쓰는 시간:" 인사이트 카드
+
+### 시나리오 9 — 장기 추세 (자체 누적 데이터)
+
+- 메인 앱 `HistoryView` (Extension 아님 — 자체 누적 SwiftData 읽기)
+- 30일 일별 라인 차트
+- "지난주 대비 ±X%", "지난달 대비 ±X%" 비교 카드
+- 가장 적게/많이 쓴 날 하이라이트
+- 데이터 14일 미만이면 `GlassCard` 빈 상태
+
+### 시나리오 10 — 설정
+
+- 권한 상태 표시 (✅ 허용 / ❌ 거부) + 재요청 버튼
+- 누적 데이터 일수 표시
+- 데이터 초기화 (확인 다이얼로그)
+- 보존 기간 설정 (90일/1년/무제한) — Picker
+- 일일 사용량 알림 토글 (옵션, P3)
+- 개인정보 처리방침 링크 + 버전 정보
+
+---
+
+### 시나리오별 기능 매핑
+
+| 시나리오 | F# | 위치 | 비고 |
+|---------|----|------|------|
+| 1 | F1 | 메인 앱 | 온보딩 + 권한 요청 |
+| 2 | F1 | 메인 앱 | 권한 거절 분기 |
+| 3 | F2 | 메인 앱 + Extension | 빈 상태 |
+| 4 | F2, F3 | Extension | 핵심 대시보드 |
+| 5 | F2 | Extension | 기간 변경 |
+| 6 | F3 | Extension | 앱 순위 |
+| 7 | F4 | Extension | 카테고리 도넛 |
+| 8 | F5 | Extension | 히트맵 |
+| 9 | F6 | 메인 앱 | 자체 누적 추세 |
+| 10 | F8 | 메인 앱 | 설정 |
+
+> F7 (픽업/알림 횟수) 는 시나리오 4 의 대시보드에 보조 카드로 통합한다.
