@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */; };
+		DE81DCE5AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE4AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework */; };
 		DE81DCED2F9A63BE0045FDC5 /* UsageReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DE81DCFE2F9A67880045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFD2F9A67880045FDC5 /* PersonalColorDesignSystem */; };
 		DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFF2F9A69890045FDC5 /* PersonalColorDesignSystem */; };
@@ -41,6 +42,7 @@
 		DE81DCB22F9A5FF20045FDC5 /* PhoneUsageTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhoneUsageTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UsageReportExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
+		DE81DCE4AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = _DeviceActivity_SwiftUI.framework; path = System/Library/Frameworks/_DeviceActivity_SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -83,6 +85,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */,
+				DE81DCE5AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework in Frameworks */,
 				DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */,
+				DE81DCE4AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -460,9 +464,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -489,9 +493,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
