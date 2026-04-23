@@ -28,11 +28,12 @@ iOS Screen Time 데이터를 분석해 사용자가 **언제, 어떤 앱을, 얼
 ## 2. 대상 프로젝트
 
 - **앱 이름**: PhoneUsageTracker
-- **번들 ID**: com.kimnahun.PhoneUsageTracker
-- **Extension 번들 ID**: com.kimnahun.PhoneUsageTracker.UsageReport
-- **App Group ID**: group.com.kimnahun.PhoneUsageTracker
-- **최소 타겟 iOS**: 17.0 (SwiftData 사용)
+- **번들 ID**: com.nahun.PhoneUsageTracker
+- **Extension 번들 ID**: com.nahun.PhoneUsageTracker.UsageReport
+- **App Group ID**: group.com.nahun.PhoneUsageTracker
+- **최소 타겟 iOS**: 26.1 (현재 프로젝트 설정값 그대로)
 - **Swift 버전**: Swift 6 (엄격 동시성 필수)
+  - ⚠️ 현재 프로젝트는 Swift 5.0 으로 설정됨. **Build Settings → Swift Language Version → Swift 6** 으로 변경 필요
 - **UI 프레임워크**: SwiftUI + Swift Charts
 
 ---
@@ -40,23 +41,64 @@ iOS Screen Time 데이터를 분석해 사용자가 **언제, 어떤 앱을, 얼
 ## 3. 프로젝트 경로 (하네스 변수)
 
 ```bash
-PROJECT_ROOT="/Users/kimnahun/Desktop/Side-Project/PhoneUsageTracker/App"
+PROJECT_ROOT="/Users/kimnahun/Desktop/Side-Project/PhoneUsageTracker/PhoneUsageTracker"
 TARGET_DIR="PhoneUsageTracker"
 HARNESS_ROOT="/Users/kimnahun/Desktop/Side-Project/PhoneUsageTracker"
 ```
 
-> Xcode 프로젝트는 `App/PhoneUsageTracker.xcodeproj` 에 위치한다고 가정.
-> 아직 만들지 않았다면 단계 -1 진입 전에 생성 필요. (Extension 타겟 포함)
+### 실제 폴더 구조
 
-### Xcode 프로젝트 초기 구성 (수동 1회)
-1. `App/` 폴더 생성
-2. Xcode → New Project → iOS App → SwiftUI / Swift / iOS 17.0
-3. 이름 `PhoneUsageTracker`, 번들 ID 위와 동일하게
-4. Target 추가 → **Device Activity Report Extension** → 이름 `UsageReportExtension`
-5. **Capabilities** 추가:
-   - 메인 앱 + Extension 양쪽 모두에 `Family Controls` entitlement
-   - 메인 앱 + Extension 양쪽 모두에 `App Groups` (`group.com.kimnahun.PhoneUsageTracker`)
-6. `Info.plist`에 `NSUserTrackingUsageDescription` 등 권한 문구 (Screen Time 권한 요청 시 시스템이 자체 UI 표시)
+```
+/Users/kimnahun/Desktop/Side-Project/PhoneUsageTracker/   ← HARNESS_ROOT
+├── PROJECT_CONTEXT.md
+├── agents/, skills/, scripts/
+├── output/                                                ← 하네스 작업 폴더
+└── PhoneUsageTracker/                                     ← PROJECT_ROOT
+    ├── PhoneUsageTracker.xcodeproj
+    └── PhoneUsageTracker/                                 ← TARGET_DIR (소스 폴더)
+        ├── PhoneUsageTrackerApp.swift                     (현재 존재)
+        ├── ContentView.swift                              (현재 존재 — 추후 DashboardView 로 대체)
+        ├── Assets.xcassets/                               (현재 존재)
+        ├── App/                                           (생성 예정)
+        ├── Models/                                        (생성 예정)
+        ├── Services/                                      (생성 예정)
+        ├── ViewModels/                                    (생성 예정)
+        ├── Views/                                         (생성 예정)
+        └── Shared/                                        (생성 예정)
+```
+
+### Xcode 프로젝트 추가 셋업 (수동 1회 — 사용자가 진행)
+
+기본 프로젝트는 생성됨. 아래 항목이 **아직 안 되어 있어 사용자가 직접 해야 함**:
+
+1. **Swift Language Version 변경**
+   - Project → PhoneUsageTracker target → Build Settings → "Swift Language Version" → **Swift 6**
+
+2. **Family Controls capability 추가** (메인 앱 타겟)
+   - Signing & Capabilities → `+ Capability` → **Family Controls** 검색 후 추가
+   - `.entitlements` 파일에 `com.apple.developer.family-controls = true` 자동 추가됨
+
+3. **App Groups capability 추가** (메인 앱 타겟)
+   - Signing & Capabilities → `+ Capability` → **App Groups** 추가
+   - `+` 버튼으로 새 그룹 추가: `group.com.nahun.PhoneUsageTracker`
+
+4. **Background Modes capability 추가** (메인 앱 타겟, 선택)
+   - 추후 일별 집계 백그라운드 갱신용. 일단 생략 가능
+
+5. **Device Activity Report Extension 타겟 추가**
+   - File → New → Target → iOS → **Device Activity Report Extension**
+   - Product Name: `UsageReportExtension`
+   - 같은 capability 두 개 (Family Controls, App Groups) Extension 타겟에도 동일하게 추가
+   - Extension 타겟의 Bundle Identifier: `com.nahun.PhoneUsageTracker.UsageReport`
+
+6. **Info.plist 권한 문구**
+   - Screen Time 권한 요청은 시스템이 자체 UI 를 띄우므로 별도 키 불필요
+   - 단, 향후 알림 등 추가 권한 사용 시 해당 키 추가
+
+7. **개발 팀 (Signing)**
+   - 두 타겟(메인 + Extension) 모두 같은 Apple Developer Team 으로 서명
+
+> ⚠️ **셋업 완료 전에 하네스 파이프라인을 시작하지 마라.** Generator 가 만든 코드가 entitlement 부족으로 빌드 실패함.
 
 ---
 
@@ -76,6 +118,10 @@ TEST_COMMAND="xcodebuild test -project $PROJECT_ROOT/PhoneUsageTracker.xcodeproj
 
 > ⚠️ FamilyControls 권한은 **시뮬레이터에서 동작 불안정**.
 > 시뮬레이터로는 빌드만 검증, 실제 데이터 흐름 테스트는 **실기기 필수**.
+>
+> ⚠️ iOS 26.1 deployment target 이므로 시뮬레이터 OS 도 iOS 26+ 필요.
+> 사용 가능한 시뮬레이터가 없으면 `xcrun simctl list devices` 로 확인 후
+> `name=iPhone 16` 부분을 실제 존재하는 디바이스 이름으로 변경.
 
 ---
 
@@ -324,12 +370,19 @@ Color(red:..., green:..., blue:...)   // 하드코딩 금지
 
 > Xcode 통합 시 절대 덮어쓰지 않을 파일
 
-- `App/PhoneUsageTracker.xcodeproj/` -- 프로젝트 파일 전체
-- `App/PhoneUsageTracker/Assets.xcassets/` -- 앱 아이콘, 색상 자산
-- `App/PhoneUsageTracker/Info.plist` -- 직접 편집한 entitlement / 권한 문구
-- `App/PhoneUsageTracker.entitlements` -- entitlement 파일
-- `App/UsageReportExtension/Info.plist`
-- `App/UsageReportExtension/UsageReportExtension.entitlements`
+- `PhoneUsageTracker/PhoneUsageTracker.xcodeproj/` -- 프로젝트 파일 전체
+- `PhoneUsageTracker/PhoneUsageTracker/Assets.xcassets/` -- 앱 아이콘, 색상 자산
+- `PhoneUsageTracker/PhoneUsageTracker/Info.plist` -- 직접 편집한 entitlement / 권한 문구 (있으면)
+- `PhoneUsageTracker/PhoneUsageTracker/PhoneUsageTracker.entitlements` -- 메인 앱 entitlement
+- `PhoneUsageTracker/UsageReportExtension/Info.plist` -- (Extension 추가 후)
+- `PhoneUsageTracker/UsageReportExtension/UsageReportExtension.entitlements` -- (Extension 추가 후)
+
+### 교체/이동 예정 파일
+
+- `PhoneUsageTracker/PhoneUsageTracker/ContentView.swift`
+  → 추후 `Views/Dashboard/DashboardView.swift` 로 교체. 현재는 Xcode 템플릿 기본값
+- `PhoneUsageTracker/PhoneUsageTracker/PhoneUsageTrackerApp.swift`
+  → 유지하되 `App/` 폴더로 이동, DI 루트 코드 추가
 
 ---
 
