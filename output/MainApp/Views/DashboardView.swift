@@ -5,13 +5,10 @@ import PersonalColorDesignSystem
 
 struct DashboardView: View {
     @State private var viewModel: DashboardViewModel
-    @State private var currentFilter: DeviceActivityFilter?
-    private let filterService: any FilterServiceProtocol
     private let refreshInterval: TimeInterval = 300
 
-    init(viewModel: DashboardViewModel, filterService: any FilterServiceProtocol) {
+    init(viewModel: DashboardViewModel) {
         self._viewModel = State(initialValue: viewModel)
-        self.filterService = filterService
     }
 
     var body: some View {
@@ -26,14 +23,11 @@ struct DashboardView: View {
                 .padding(.top, 16)
             }
         }
-        .task { await loadInitial() }
+        .task { await viewModel.onAppear() }
         .task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(refreshInterval))
                 await viewModel.refreshTick()
-                if viewModel.authorization == .approved {
-                    await rebuildFilter()
-                }
             }
         }
         .navigationTitle("대시보드")
@@ -44,10 +38,9 @@ struct DashboardView: View {
         Picker("기간", selection: Binding(
             get: { viewModel.selectedRange },
             set: { range in
-                HapticManager.selection()
+                HapticManager.impact(.light)
                 Task {
                     await viewModel.selectRange(range)
-                    await rebuildFilter()
                 }
             }
         )) {
@@ -61,7 +54,7 @@ struct DashboardView: View {
 
     @ViewBuilder
     private var reportCard: some View {
-        if let filter = currentFilter {
+        if let filter = viewModel.currentFilter {
             GlassCard {
                 DeviceActivityReport(.totalActivity, filter: filter)
                     .frame(minHeight: 320)
@@ -76,7 +69,7 @@ struct DashboardView: View {
         GlassCard {
             VStack(spacing: 16) {
                 Image(systemName: "hourglass")
-                    .font(.system(size: 44))
+                    .font(.pDisplay(44))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("데이터 수집 중")
@@ -89,16 +82,5 @@ struct DashboardView: View {
             .padding(32)
         }
         .accessibilityLabel("데이터 수집 중. 잠시 후 다시 확인해 주세요.")
-    }
-
-    private func loadInitial() async {
-        await viewModel.onAppear()
-        if viewModel.authorization == .approved {
-            await rebuildFilter()
-        }
-    }
-
-    private func rebuildFilter() async {
-        currentFilter = await filterService.buildFilter(for: viewModel.selectedRange, now: .now)
     }
 }

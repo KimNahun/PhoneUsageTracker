@@ -5,7 +5,7 @@ import DeviceActivity
 final class MockFilterService: FilterServiceProtocol, @unchecked Sendable {
     private(set) var lastBuildArgument: DateRange?
 
-    func buildFilter(for range: DateRange, now: Date) -> DeviceActivityFilter {
+    func buildFilter(for range: DateRange, now: Date) async -> DeviceActivityFilter {
         lastBuildArgument = range
         return DeviceActivityFilter(
             segment: .daily(during: DateInterval(start: now, duration: 86400)),

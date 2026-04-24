@@ -3,6 +3,7 @@ import PersonalColorDesignSystem
 
 struct OnboardingView: View {
     @State private var viewModel: OnboardingViewModel
+    @State private var currentPage: Int = 0
     let onComplete: (AuthorizationState) -> Void
 
     init(viewModel: OnboardingViewModel, onComplete: @escaping (AuthorizationState) -> Void) {
@@ -13,13 +14,18 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             PGradientBackground()
-            TabView(selection: $viewModel.step) {
+            TabView(selection: $currentPage) {
                 page0.tag(0)
                 page1.tag(1)
                 page2.tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
+        }
+        .onChange(of: viewModel.step) { _, newStep in
+            withAnimation {
+                currentPage = newStep
+            }
         }
         .onChange(of: viewModel.result) { _, newValue in
             if let state = newValue {
@@ -33,7 +39,7 @@ struct OnboardingView: View {
         GlassCard {
             VStack(spacing: 20) {
                 Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 60))
+                    .font(.pDisplay(60))
                     .foregroundStyle(Color.pAccentPrimary)
                     .accessibilityHidden(true)
                 Text("폰 사용 분석기")
@@ -58,7 +64,7 @@ struct OnboardingView: View {
         GlassCard {
             VStack(spacing: 20) {
                 Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 60))
+                    .font(.pDisplay(60))
                     .foregroundStyle(Color.pAccentSecondary)
                     .accessibilityHidden(true)
                 Text("완전한 프라이버시")
@@ -83,7 +89,7 @@ struct OnboardingView: View {
         GlassCard {
             VStack(spacing: 20) {
                 Image(systemName: "clock.badge.checkmark.fill")
-                    .font(.system(size: 60))
+                    .font(.pDisplay(60))
                     .foregroundStyle(Color.pSuccess)
                     .accessibilityHidden(true)
                 Text("Screen Time 권한")

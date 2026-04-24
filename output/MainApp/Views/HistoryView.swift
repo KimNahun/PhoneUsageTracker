@@ -146,7 +146,7 @@ struct HistoryView: View {
         GlassCard {
             VStack(spacing: 16) {
                 Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.system(size: 44))
+                    .font(.pDisplay(44))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("데이터 누적 중")

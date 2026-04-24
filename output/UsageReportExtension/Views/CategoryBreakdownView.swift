@@ -25,7 +25,7 @@ struct CategoryBreakdownView: View {
         GlassCard {
             VStack(spacing: 12) {
                 Image(systemName: "square.grid.2x2")
-                    .font(.system(size: 40))
+                    .font(.pDisplay(40))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("카테고리 데이터가 없습니다")
@@ -70,14 +70,14 @@ struct CategoryBreakdownView: View {
                     Text("합계")
                         .font(.pCaption(11))
                         .foregroundStyle(Color.pTextTertiary)
-                    Text(formatDuration(viewModel.totalSeconds))
+                    Text(DurationFormatter.format(viewModel.totalSeconds))
                         .font(.pTitle(16))
                         .foregroundStyle(Color.pTextPrimary)
                 }
             }
             .padding(16)
         }
-        .accessibilityLabel("카테고리별 사용 시간 도넛 차트, 총 \(formatDuration(viewModel.totalSeconds))")
+        .accessibilityLabel("카테고리별 사용 시간 도넛 차트, 총 \(DurationFormatter.format(viewModel.totalSeconds))")
     }
 
     private var legendCard: some View {
@@ -91,24 +91,18 @@ struct CategoryBreakdownView: View {
                             .accessibilityHidden(true)
                         Label(slice.token)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text(formatDuration(slice.seconds))
+                        Text(DurationFormatter.format(slice.seconds))
                             .font(.pCaption(12))
                             .foregroundStyle(Color.pTextSecondary)
                         Text("\(Int(slice.share * 100))%")
                             .font(.pCaption(12))
                             .foregroundStyle(Color.pTextTertiary)
                     }
-                    .accessibilityLabel("사용 시간 \(formatDuration(slice.seconds)), \(Int(slice.share * 100))퍼센트")
+                    .accessibilityLabel("사용 시간 \(DurationFormatter.format(slice.seconds)), \(Int(slice.share * 100))퍼센트")
                 }
             }
             .padding(16)
         }
     }
 
-    private func formatDuration(_ seconds: Double) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        if h > 0 { return "\(h)시간 \(m)분" }
-        return "\(m)분"
-    }
 }

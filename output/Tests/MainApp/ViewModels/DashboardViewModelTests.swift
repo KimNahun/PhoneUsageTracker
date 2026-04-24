@@ -20,12 +20,20 @@ struct DashboardViewModelTests {
         #expect(vm.authorization == .approved)
     }
 
-    @Test("onAppear does not mark filter ready when denied")
-    func onAppearDoesNotMarkFilterReadyWhenDenied() async {
+    @Test("onAppear builds filter when approved")
+    func onAppearBuildsFilterWhenApproved() async {
+        let auth = MockAuthorizationService(state: .approved)
+        let vm = DashboardViewModel(authService: auth, filterService: MockFilterService())
+        await vm.onAppear()
+        #expect(vm.currentFilter != nil)
+    }
+
+    @Test("onAppear does not build filter when denied")
+    func onAppearDoesNotBuildFilterWhenDenied() async {
         let auth = MockAuthorizationService(state: .denied)
         let vm = DashboardViewModel(authService: auth, filterService: MockFilterService())
         await vm.onAppear()
-        #expect(vm.isFilterReady == false)
+        #expect(vm.currentFilter == nil)
     }
 
     @Test("selectedRange defaults to today")
@@ -37,13 +45,15 @@ struct DashboardViewModelTests {
         #expect(vm.selectedRange == .today)
     }
 
-    @Test("selectRange marks filter ready when approved")
-    func selectRangeMarksFilterReadyWhenApproved() async {
+    @Test("selectRange builds filter when approved")
+    func selectRangeBuildsFilterWhenApproved() async {
         let auth = MockAuthorizationService(state: .approved)
-        let vm = DashboardViewModel(authService: auth, filterService: MockFilterService())
+        let filter = MockFilterService()
+        let vm = DashboardViewModel(authService: auth, filterService: filter)
         await vm.selectRange(.month)
-        #expect(vm.isFilterReady == true)
+        #expect(vm.currentFilter != nil)
         #expect(vm.selectedRange == .month)
+        #expect(await filter.lastBuildArgument == .month)
     }
 
     @Test("refreshTick updates lastRefresh when approved")

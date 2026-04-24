@@ -149,6 +149,10 @@ struct SettingsView: View {
                 }
                 Button("개인정보 처리방침") {
                     HapticManager.impact(.light)
+                    // TODO: 실제 개인정보 처리방침 URL로 교체
+                    if let url = URL(string: "https://example.com/privacy-policy") {
+                        UIApplication.shared.open(url)
+                    }
                 }
                 .font(.pBody(14))
                 .foregroundStyle(Color.pAccentPrimary)

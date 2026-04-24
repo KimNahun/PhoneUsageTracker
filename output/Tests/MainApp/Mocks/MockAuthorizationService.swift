@@ -10,5 +10,5 @@ struct MockAuthorizationService: AuthorizationServiceProtocol {
 
     func currentState() async -> AuthorizationState { state }
     func requestAuthorization() async -> AuthorizationState { state }
-    func openSettingsURLString() -> String { settingsURL }
+    func openSettingsURLString() async -> String { settingsURL }
 }

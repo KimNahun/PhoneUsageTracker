@@ -67,17 +67,19 @@ struct TotalActivityScene: DeviceActivityReportScene {
         if segmentKind == .daily {
             await persistDailyData(
                 buckets: buckets,
-                pickupCount: 0,
-                notificationCount: 0
+                pickupCount: nil,
+                notificationCount: nil
             )
         }
 
+        // Note: DeviceActivityResults does not expose pickup/notification counts directly.
+        // These fields are nil to indicate "not available" and the UI shows "미지원".
         let config = TotalActivityConfiguration(
             totalSeconds: totalSeconds,
             buckets: buckets,
             segmentKind: segmentKind,
-            pickupCount: 0,
-            notificationCount: 0,
+            pickupCount: nil,
+            notificationCount: nil,
             isEmpty: false
         )
         ExtensionLogger.scene.info("TotalActivityScene.makeConfiguration 완료: \(totalSeconds)s, \(buckets.count) buckets")
@@ -86,8 +88,8 @@ struct TotalActivityScene: DeviceActivityReportScene {
 
     private func persistDailyData(
         buckets: [BucketPoint],
-        pickupCount: Int,
-        notificationCount: Int
+        pickupCount: Int?,
+        notificationCount: Int?
     ) async {
         guard let writer = try? DailyAggregateWriter() else { return }
         let total = buckets.reduce(0) { $0 + $1.totalSeconds }
@@ -97,8 +99,8 @@ struct TotalActivityScene: DeviceActivityReportScene {
             try await writer.write(
                 date: Date(),
                 perApp: [(tokenData: Data("__total__".utf8), seconds: total)],
-                pickupCount: pickupCount,
-                notificationCount: notificationCount
+                pickupCount: pickupCount ?? 0,
+                notificationCount: notificationCount ?? 0
             )
         } catch {
             ExtensionLogger.persistence.error("TotalActivityScene persist 실패: \(error)")
