@@ -1,277 +1,150 @@
-# Harness Engineering for iOS
+# PhoneUsageTracker
 
-**Claude Code 기반 iOS 앱 코드 생성 품질 보장 시스템**
+iOS Screen Time 데이터를 분석해 **언제, 어떤 앱을, 얼마나** 사용했는지 시각화하는 개인용 앱.
 
-3-Agent 파이프라인(Planner → Generator → Evaluator)으로 Swift 6 + SwiftUI + MVVM 코드를 자동 생성하고, 평가 기준표로 품질을 강제합니다.
-
-어떤 iOS 프로젝트에도 `PROJECT_CONTEXT.md` 하나만 작성하면 적용할 수 있습니다.
+Swift 6 + SwiftUI + Swift Charts + MVVM + DeviceActivity API 기반.
 
 ---
 
-## 왜 필요한가?
+## 주요 기능
 
-일반적으로 AI에게 "앱 만들어줘"라고 하면 품질이 일정하지 않습니다.
-
-| 문제 | 하네스 해결 방식 |
-|------|-----------------|
-| Swift 6 동시성 누락 (`@MainActor` 빠짐, `DispatchQueue` 섞임) | Evaluator가 전수검사, 위반 시 불합격 |
-| MVVM 레이어 오염 (View에 로직, ViewModel에 SwiftUI) | 체크리스트 기반 감점 |
-| 자기 코드에 관대한 평가 | Generator와 Evaluator를 다른 에이전트로 분리 |
-| 매번 "Swift 6 써줘, MVVM으로 해줘" 반복 | rules/로 자동 적용 |
+| 기능 | 설명 |
+|------|------|
+| 시간대별 사용 차트 | 오늘/주/월/연 단위 막대/라인 차트 |
+| 앱별 순위 | 사용 시간 Top 20 + 퍼센트 비율 |
+| 카테고리 분석 | 소셜/게임/생산성 등 도넛 차트 |
+| 시간대 히트맵 | 7일 x 24시간 격자 RectangleMark |
+| 장기 추세 | 자체 누적 SwiftData 기반 30일 라인 차트 |
+| 온보딩 + 권한 | 3단계 안내 + Screen Time 권한 요청 |
 
 ---
 
-## 시스템 구성
+## 아키텍처
 
 ```
-harness/
-├── CLAUDE.md                           # 오케스트레이터 (파이프라인 전체 흐름)
-├── PROJECT_CONTEXT.template.md         # 프로젝트별 설정 템플릿
-│
-├── agents/                             # 서브에이전트
-│   ├── planner.md                      #   아키텍처 설계 (opus)
-│   ├── generator.md                    #   Swift 코드 생성 (sonnet → opus)
-│   ├── evaluator.md                    #   QA 검수 (opus)
-│   ├── ios-reviewer.md                 #   피드백 수정 (opus)
-│   └── evaluation_criteria.md          #   공통 평가 기준표
-│
-├── .claude/
-│   ├── settings.json                   # 훅 설정 (시스템 레벨 강제)
-│   ├── rules/                          # 코딩 규칙 (항상 자동 적용)
-│   │   ├── swift-style.md              #   Swift 코딩 스타일
-│   │   ├── swift-concurrency.md        #   Swift 6 동시성 규칙
-│   │   ├── ios-security.md             #   iOS 보안 규칙
-│   │   ├── hig.md                      #   Human Interface Guidelines
-│   │   ├── testing.md                  #   테스트 규칙
-│   │   └── workflow-enforcement.md     #   워크플로우 강제 규칙
-│   └── commands/                       # 슬래시 커맨드
-│       ├── harness.md                  #   /harness [설명]
-│       ├── feedback.md                 #   /feedback [내용]
-│       ├── build-fix.md                #   /build-fix
-│       ├── evaluate.md                 #   /evaluate
-│       └── tdd.md                      #   /tdd [대상]
-│
-├── skills/                             # 재사용 워크플로우
-│   ├── harness-pipeline/SKILL.md       #   3-Agent 파이프라인
-│   ├── feedback-loop/SKILL.md          #   사용자 피드백 루프
-│   ├── ios-tdd/SKILL.md                #   TDD 워크플로우
-│   └── build-fix/SKILL.md              #   빌드 에러 수정
-│
-├── scripts/hooks/                      # 시스템 훅 스크립트
-│   ├── block-direct-write.js           #   프로젝트 폴더 직접 Write 차단
-│   ├── swift-syntax-check.js           #   Swift 문법 검증 (파일별)
-│   └── pre-commit-build.js             #   커밋 전 빌드 검증 + 자동 커밋
-│
-└── START.md                            # 시작 가이드
+PhoneUsageTracker (메인 앱)
+├── App/                    # @main, DI 루트
+├── Models/                 # struct + Sendable
+├── Services/               # actor (Protocol 기반 DI)
+├── ViewModels/             # @MainActor + @Observable
+├── Views/                  # SwiftUI (DeviceActivityReport embed)
+└── Shared/                 # 유틸리티, 공통 컴포넌트
+
+UsageReportExtension (Extension)
+├── Scenes/                 # DeviceActivityReportScene (5개)
+├── Views/                  # Swift Charts 렌더링
+├── ViewModels/             # Extension 내 집계 로직
+├── Persistence/            # App Group SwiftData 누적 저장
+└── Shared/                 # 공통 유틸
 ```
 
----
-
-## 파이프라인 흐름
-
-```
-사용자: "레시피 관리 앱 만들어줘"
-         │
-         ▼
-┌─ 단계 1: Planner (opus) ──────────────────┐
-│  SPEC.md 생성                              │
-│  아키텍처, 기능 목록, 화면 흐름, 동시성 경계 │
-└────────────────────────────────────────────┘
-         │
-         ▼
-┌─ 단계 2: Generator (sonnet) ──────────────┐
-│  output/*.swift 생성                       │
-│  View, ViewModel, Service, Model 전부      │
-└────────────────────────────────────────────┘
-         │
-         ▼
-┌─ 단계 2.5: 빌드 게이트 ──────────────────────┐
-│  xcodebuild로 컴파일 + 테스트 통과 확인      │
-│  실패 시 → Generator가 자동 수정             │
-└────────────────────────────────────────────┘
-         │
-         ▼
-┌─ 단계 3: Evaluator (opus) ────────────────┐
-│  QA_REPORT.md 생성                         │
-│  5개 항목 채점 → 7.0 미만이면 불합격        │
-└────────────────────────────────────────────┘
-         │
-    합격? ─── No ──→ Generator로 복귀 (최대 3회)
-         │
-        Yes
-         │
-         ▼
-┌─ 단계 5: Xcode 통합 ─────────────────────┐
-│  output/ → 프로젝트 폴더 동기화            │
-└────────────────────────────────────────────┘
-```
+**핵심 제약**: Screen Time raw 데이터는 **Extension 안에서만** 접근 가능. 메인 앱은 `DeviceActivityReport` SwiftUI 뷰를 embed하여 Extension이 렌더링한 차트를 표시.
 
 ---
 
-## 평가 기준
+## 기술 스택
 
-| 항목 | 비중 | 핵심 기준 |
-|------|------|-----------|
-| **Swift 6 동시성** | 30% | `@MainActor`, `actor`, `Sendable`, 구버전 패턴 금지 |
-| **MVVM 분리** | 25% | View↔ViewModel↔Service 단방향, 레이어 오염 금지 |
-| **HIG 준수** | 20% | Dynamic Type, 44pt 터치 영역, 접근성, 로딩/에러 UI |
-| **API 활용** | 15% | Apple Framework 올바른 사용, Service 레이어에서만 호출 |
-| **기능성/가독성** | 10% | 완성도, 접근 제어자, 에러 타입 |
-
-- **7.0 이상** → 합격
-- **5.0 ~ 6.9** → 조건부 합격 (피드백 반영 후 재검수)
-- **5.0 미만** → 불합격
-- **동시성 또는 MVVM 4점 이하** → 무조건 불합격
+- **Swift 6** (strict concurrency, `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`)
+- **SwiftUI** + **Swift Charts** (BarMark, LineMark, SectorMark, RectangleMark)
+- **DeviceActivity / FamilyControls / ManagedSettings** (Screen Time API)
+- **SwiftData** (App Group 공유 컨테이너 — 장기 추세 누적)
+- **PersonalColorDesignSystem** (커스텀 디자인 시스템 SPM 패키지)
+- **MVVM** (View → ViewModel → Service 단방향 의존)
 
 ---
 
-## 시스템 레벨 강제 규칙
+## 요구사항
 
-슬래시 커맨드 없이도 **항상 자동 적용**되는 규칙:
-
-| 규칙 | 강제 방식 |
-|------|-----------|
-| 신규 기능 → 테스트 코드 필수 | rule (AI 행동 지침) |
-| 신규 기능 → 로그 필수 | rule |
-| 기능 완료/버그 수정 → 커밋 필수 | rule + hook (Stop 시 자동) |
-| 시뮬레이터 고정 (신규 생성 금지) | rule |
-| 디자인 시스템 사용 강제 | rule |
-| 빌드 오류 검사 | rule + hook 2중 (파일별 syntax + 커밋 전 전체 빌드) |
-| 프로젝트 폴더 직접 Write 차단 | hook (PreToolUse) |
+- iOS 17.0+
+- Xcode 26+
+- Apple Developer 계정 (Family Controls capability 필요)
+- **실기기 필수** (시뮬레이터에서는 Screen Time 데이터 없음)
 
 ---
 
-## 빠른 시작
+## 셋업
 
-### 1. 프로젝트 설정
+### 1. 클론
 
 ```bash
-cd harness
-cp PROJECT_CONTEXT.template.md PROJECT_CONTEXT.md
-# PROJECT_CONTEXT.md를 열고 앱 이름, 경로, 빌드 명령어 등 작성
+git clone https://github.com/KimNahun/PhoneUsageTracker.git
+cd PhoneUsageTracker
 ```
 
-### 2. 파이프라인 실행
+### 2. Xcode 설정 (1회)
+
+1. `PhoneUsageTracker/PhoneUsageTracker.xcodeproj` 열기
+2. 두 타겟(PhoneUsageTracker, UsageReportExtension) 모두:
+   - **Signing & Capabilities** → 본인 Team 선택
+   - **Family Controls** capability 확인
+   - **App Groups** → `group.com.nahun.PhoneUsageTracker` 확인
+3. PersonalColorDesignSystem 패키지가 자동 resolve 되는지 확인
+
+### 3. 실기기 빌드
 
 ```bash
-claude
-```
-
-```
-/harness Core Data 기반 레시피 관리 앱 만들어줘
-```
-
-### 3. 피드백 루프 (앱을 써보고)
-
-```
-/feedback [버그] 저장 후 목록에 안 뜸
-/feedback [UI] 다크모드에서 텍스트 안 보임
+xcodebuild -project PhoneUsageTracker/PhoneUsageTracker.xcodeproj \
+  -scheme PhoneUsageTracker \
+  -destination 'id=YOUR_DEVICE_ID' \
+  build
 ```
 
 ---
 
-## 커맨드
+## 프로젝트 구조
+
+```
+PhoneUsageTracker/
+├── CLAUDE.md                      # 3-Agent 하네스 오케스트레이터
+├── PROJECT_CONTEXT.md             # 프로젝트 고정 요구사항
+├── SPEC.md                        # Planner가 생성한 설계서
+├── QA_REPORT.md                   # Evaluator QA 결과
+├── BUILD_RESULT.md                # 빌드 게이트 결과
+│
+├── output/                        # 하네스 작업 폴더
+│   ├── MainApp/                   # 메인 앱 소스
+│   └── UsageReportExtension/      # Extension 소스
+│
+├── PhoneUsageTracker/             # Xcode 프로젝트
+│   ├── PhoneUsageTracker.xcodeproj
+│   ├── PhoneUsageTracker/         # 메인 앱 타겟 소스
+│   └── UsageReportExtension/      # Extension 타겟 소스
+│
+├── agents/                        # 서브에이전트 지시서
+├── skills/                        # 슬래시 커맨드 워크플로우
+└── .claude/rules/                 # Swift 6, MVVM, HIG 등 코딩 규칙
+```
+
+---
+
+## 하네스 파이프라인
+
+이 프로젝트는 [Claude Code](https://claude.ai/code) 기반 3-Agent 하네스로 개발되었습니다.
+
+```
+Planner (opus)  →  SPEC.md 설계
+Generator (sonnet/opus)  →  Swift 파일 생성
+Build Gate  →  xcodebuild 빌드/테스트 검증
+Evaluator (opus)  →  QA_REPORT.md 채점 (7.0/10 이상 합격)
+```
+
+### 커맨드
 
 | 커맨드 | 용도 |
 |--------|------|
-| `/harness [설명]` | 3-Agent 파이프라인 전체 실행 |
-| `/feedback [내용]` | 피드백 1건씩 처리 + 커밋 |
-| `/build-fix` | Xcode 빌드 에러 진단/수정 |
-| `/evaluate` | Evaluator만 단독 실행 (점수 확인) |
-| `/tdd [대상]` | TDD 워크플로우 (Red→Green→Refactor) |
-
-자연어로 말해도 rules/가 자동 적용되므로 동일한 품질 규칙이 적용됩니다.
+| `/harness [설명]` | 파이프라인 전체 실행 |
+| `/feedback [내용]` | 피드백 1건 처리 |
+| `/build-fix` | 빌드 에러 진단/수정 |
+| `/evaluate` | QA 검수만 실행 |
 
 ---
 
-## 다른 프로젝트에 적용
+## 알려진 이슈
 
-**`PROJECT_CONTEXT.md` 이 파일 하나만 바꾸면 됩니다.** 나머지는 전부 공용입니다.
-
-```bash
-cp PROJECT_CONTEXT.template.md PROJECT_CONTEXT.md
-# PROJECT_CONTEXT.md를 열고 프로젝트에 맞게 수정
-```
-
-### 공용 vs 프로젝트별
-
-```
-공용 (안 바꿈)                    프로젝트별 (이것만 바꿈)
-─────────────                   ──────────────────
-agents/planner.md               PROJECT_CONTEXT.md
-agents/generator.md
-agents/evaluator.md
-agents/ios-reviewer.md
-agents/evaluation_criteria.md
-.claude/rules/*
-.claude/commands/*
-skills/*
-scripts/hooks/*
-```
-
-### PROJECT_CONTEXT.md에서 바꿀 항목
-
-| 섹션 | 바꿀 내용 | 예시 |
-|------|-----------|------|
-| **앱 이름 / 번들 ID** | 프로젝트 기본 정보 | `MyRecipeApp`, `com.nahun.MyRecipeApp` |
-| **프로젝트 경로** | `PROJECT_ROOT`, `TARGET_DIR`, `HARNESS_ROOT` | `/Users/you/Desktop/MyRecipeApp` |
-| **빌드 / 테스트 명령어** | `BUILD_COMMAND`, `TEST_COMMAND` | scheme, destination 변경 |
-| **Xcode 통합 방식** | `SYNC_METHOD` | `auto` (파일 복사만) 또는 `manual` |
-| **디자인 시스템** | 커스텀 SPM 패키지 (없으면 삭제) | `PersonalColorDesignSystem` |
-| **추가 기능 요구사항** | 프로젝트 고유 기능/제약 | "Core Data 사용", "AlarmKit 연동" |
-| **API 문서 수집** | NotebookLM/context7 질의 목록 (없으면 삭제) | 노트북 ID, 질문 |
-| **기존 코드 참고** | Generator가 참고할 기존 파일 경로 | `Services/AuthService.swift` |
-| **보존 파일** | 덮어쓰면 안 되는 파일 | `Utils/Logger.swift` |
-
-### 예시: 레시피 앱
-
-```markdown
-## 대상 프로젝트
-- 앱 이름: MyRecipeApp
-- 번들 ID: com.nahun.MyRecipeApp
-- 최소 타겟 iOS: 17.0
-
-## 프로젝트 경로
-PROJECT_ROOT="/Users/haesuyoun/Desktop/MyRecipeApp"
-TARGET_DIR="MyRecipeApp"
-HARNESS_ROOT="/Users/haesuyoun/Desktop/NahunPersonalFolder/harness"
-
-## 빌드 / 테스트 명령어
-BUILD_COMMAND="xcodebuild -project $PROJECT_ROOT/MyRecipeApp.xcodeproj \
-  -scheme MyRecipeApp \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  build 2>&1 | grep -E 'error:|BUILD (SUCCEEDED|FAILED)'"
-
-## 사용자 추가 요구사항
-#### 1. Core Data + CloudKit 동기화
-- 레시피 모델을 Core Data로 저장
-- CloudKit으로 디바이스 간 동기화
-```
-
-### 예시: 건강 대시보드 앱
-
-```markdown
-## 대상 프로젝트
-- 앱 이름: HealthDash
-- 번들 ID: com.nahun.HealthDash
-- 최소 타겟 iOS: 17.0
-
-## 사용자 추가 요구사항
-#### 1. HealthKit 데이터 읽기
-- 걸음 수, 심박수, 수면 데이터
-- HealthKit 권한 요청 흐름
-
-#### 2. Swift Charts로 시각화
-- 일/주/월 단위 차트
-```
+- **iOS 26.x DeviceActivityReportExtension regression**: iOS 26에서 DeviceActivity API에 시스템 레벨 버그가 있어 Extension이 로드되지 않는 현상이 보고됨. Apple의 수정 대기 중. ([Apple Developer Forums](https://developer.apple.com/forums/thread/808470))
 
 ---
 
-## 기반 기술
-
-- [Claude Code](https://claude.ai/code) — Anthropic의 AI 코딩 CLI
-- [Everything Claude Code](https://github.com/affaan-m/everything-claude-code) — Claude Code 플러그인 프레임워크
-
-## License
+## 라이선스
 
 MIT
