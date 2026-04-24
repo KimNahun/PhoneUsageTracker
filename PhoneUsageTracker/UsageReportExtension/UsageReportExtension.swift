@@ -19,7 +19,9 @@ struct MinimalTestScene: DeviceActivityReportScene {
     }
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> String {
-        return "Extension 로드 성공! 데이터 항목: \(data.flatMap { _ in [1] }.count)"
+        var count = 0
+        for await _ in data { count += 1 }
+        return "Extension 로드 성공! 데이터 항목: \(count)"
     }
 }
 
