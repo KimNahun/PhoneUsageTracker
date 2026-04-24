@@ -18,9 +18,6 @@ struct MainTabView: View {
         TabView {
             NavigationStack {
                 DashboardView(viewModel: dashboardVM)
-                    .navigationDestination(for: DeviceActivityFilter.self) { filter in
-                        HeatmapHostView(filter: filter)
-                    }
             }
             .tabItem { Label("대시보드", systemImage: "chart.bar.fill") }
             .accessibilityLabel("대시보드 탭")

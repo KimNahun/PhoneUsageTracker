@@ -5,6 +5,7 @@ import PersonalColorDesignSystem
 
 struct DashboardView: View {
     @State private var viewModel: DashboardViewModel
+    @State private var showHeatmap = false
     private let refreshInterval: TimeInterval = 300
 
     init(viewModel: DashboardViewModel) {
@@ -60,8 +61,41 @@ struct DashboardView: View {
                     .frame(minHeight: 320)
             }
             .accessibilityLabel("사용 시간 리포트")
+
+            heatmapButton(filter: filter)
         } else {
             emptyStateCard
+        }
+    }
+
+    private func heatmapButton(filter: DeviceActivityFilter) -> some View {
+        Button {
+            HapticManager.impact(.light)
+            showHeatmap = true
+        } label: {
+            GlassCard {
+                HStack {
+                    Image(systemName: "rectangle.grid.3x2.fill")
+                        .font(.pTitle(18))
+                        .foregroundStyle(Color.pAccentSecondary)
+                        .accessibilityHidden(true)
+                    Text("시간대 히트맵 보기")
+                        .font(.pBodyMedium(15))
+                        .foregroundStyle(Color.pTextPrimary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.pCaption(12))
+                        .foregroundStyle(Color.pTextTertiary)
+                        .accessibilityHidden(true)
+                }
+                .padding(14)
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
+        .accessibilityLabel("시간대 히트맵 보기. 탭하여 이동")
+        .navigationDestination(isPresented: $showHeatmap) {
+            HeatmapHostView(filter: filter)
         }
     }
 

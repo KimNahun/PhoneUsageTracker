@@ -29,6 +29,11 @@ final class SettingsViewModel {
         async let days = (try? historyService.totalRecordedDays()) ?? 0
         authorization = await authState
         recordedDays  = await days
+
+        let storedRaw = UserDefaults.standard.integer(forKey: "retentionPolicyRaw")
+        if let stored = RetentionPolicy(rawValue: storedRaw) {
+            retention = stored
+        }
     }
 
     func requestPermissionAgain() async {
@@ -37,6 +42,7 @@ final class SettingsViewModel {
 
     func changeRetention(_ policy: RetentionPolicy) async {
         retention = policy
+        UserDefaults.standard.set(policy.rawValue, forKey: "retentionPolicyRaw")
         do {
             try await retentionService.apply(policy)
         } catch {
