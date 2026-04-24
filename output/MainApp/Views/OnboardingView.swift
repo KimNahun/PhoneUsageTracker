@@ -128,24 +128,3 @@ struct OnboardingView: View {
         .padding(24)
     }
 }
-
-struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.pBodyMedium(16))
-            .foregroundStyle(Color.pTextPrimary)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            colors: [.pAccentPrimary, .pAccentSecondary],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-            )
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
-    }
-}

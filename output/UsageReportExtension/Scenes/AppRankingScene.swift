@@ -17,9 +17,12 @@ struct AppRankingScene: DeviceActivityReportScene {
         // token → (token, tokenData, accumulatedSeconds)
         var tokenMap: [Data: (token: ApplicationToken, seconds: Double)] = [:]
         var totalSeconds: Double = 0
+        // per-app hourly buckets: tokenData → [segmentDate: seconds]
+        var perAppSegments: [Data: [Date: Double]] = [:]
 
         for await activityData in data {
             for await activitySegment in activityData.activitySegments {
+                let segmentDate = activitySegment.dateInterval.start
                 for await categoryActivity in activitySegment.categories {
                     for await appActivity in categoryActivity.applications {
                         guard let token = appActivity.application.token else { continue }
@@ -33,6 +36,11 @@ struct AppRankingScene: DeviceActivityReportScene {
                             } else {
                                 tokenMap[tokenData] = (token: token, seconds: duration)
                             }
+
+                            // Collect per-app segment buckets
+                            var segmentMap = perAppSegments[tokenData, default: [:]]
+                            segmentMap[segmentDate, default: 0] += duration
+                            perAppSegments[tokenData] = segmentMap
                         }
                     }
                 }
@@ -48,13 +56,26 @@ struct AppRankingScene: DeviceActivityReportScene {
             )
         }
 
+        // Build per-app bucket points
+        var perAppBuckets: [Data: [BucketPoint]] = [:]
+        for (tokenData, segmentMap) in perAppSegments {
+            let buckets = segmentMap
+                .sorted { $0.key < $1.key }
+                .map { BucketPoint(date: $0.key, totalSeconds: $0.value, kind: .hour) }
+            perAppBuckets[tokenData] = buckets
+        }
+
         // Persist per-app daily data
         if !tokenMap.isEmpty {
             let perApp = tokenMap.map { (tokenData: $0.key, seconds: $0.value.seconds) }
             await persistAppData(perApp: perApp)
         }
 
-        let config = AppRankingConfiguration(rows: Array(rows), totalSeconds: totalSeconds)
+        let config = AppRankingConfiguration(
+            rows: Array(rows),
+            totalSeconds: totalSeconds,
+            perAppBuckets: perAppBuckets
+        )
         ExtensionLogger.scene.info("AppRankingScene.makeConfiguration 완료: \(rows.count) apps, total=\(totalSeconds)s")
         return config
     }

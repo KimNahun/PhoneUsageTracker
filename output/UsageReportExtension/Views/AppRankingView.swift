@@ -26,7 +26,7 @@ struct AppRankingView: View {
             NavigationStack {
                 AppDetailView(configuration: AppDetailConfiguration(
                     token: row.token,
-                    buckets: [],
+                    buckets: viewModel.buckets(for: row),
                     totalSeconds: row.seconds
                 ))
                 .navigationTitle("앱 상세")

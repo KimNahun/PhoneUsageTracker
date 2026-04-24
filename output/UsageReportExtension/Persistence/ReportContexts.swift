@@ -69,6 +69,7 @@ public struct AppRankingRow: Sendable, Identifiable {
 public struct AppRankingConfiguration: Sendable {
     public let rows: [AppRankingRow]
     public let totalSeconds: Double
+    public let perAppBuckets: [Data: [BucketPoint]]
 }
 
 public struct CategorySlice: Sendable, Identifiable {

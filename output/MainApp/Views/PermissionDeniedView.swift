@@ -72,18 +72,3 @@ struct PermissionDeniedView: View {
         }
     }
 }
-
-struct SecondaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.pBodyMedium(16))
-            .foregroundStyle(Color.pAccentPrimary)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(Color.pAccentPrimary, lineWidth: 1.5)
-            )
-            .opacity(configuration.isPressed ? 0.7 : 1.0)
-    }
-}
