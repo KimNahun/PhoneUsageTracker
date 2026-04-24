@@ -168,7 +168,7 @@
 			);
 			productName = UsageReportExtension;
 			productReference = DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */;
-			productType = "com.apple.product-type.extensionkit-extension";
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
