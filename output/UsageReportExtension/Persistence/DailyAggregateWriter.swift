@@ -27,9 +27,10 @@ actor DailyAggregateWriter: DailyAggregateWriterProtocol {
         let dayStart = calendar.startOfDay(for: date)
 
         for entry in perApp {
+            let tokenData = entry.tokenData
             let descriptor = FetchDescriptor<PersistedUsageRecord>(
                 predicate: #Predicate {
-                    $0.date == dayStart && $0.tokenIdentifier == entry.tokenData
+                    $0.date == dayStart && $0.tokenIdentifier == tokenData
                 }
             )
             let existing = try context.fetch(descriptor)

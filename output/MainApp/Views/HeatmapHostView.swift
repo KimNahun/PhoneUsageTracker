@@ -1,5 +1,6 @@
 import SwiftUI
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 import PersonalColorDesignSystem
 
 struct HeatmapHostView: View {
@@ -11,7 +12,7 @@ struct HeatmapHostView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     GlassCard {
-                        DeviceActivityReport(context: .hourlyHeatmap, filter: filter)
+                        DeviceActivityReport(.hourlyHeatmap, filter: filter)
                             .frame(minHeight: 320)
                     }
                     .accessibilityLabel("시간대별 사용 히트맵")

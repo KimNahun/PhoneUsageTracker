@@ -1,5 +1,6 @@
 import SwiftUI
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 import PersonalColorDesignSystem
 
 struct AppRankingHostView: View {
@@ -11,7 +12,7 @@ struct AppRankingHostView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     GlassCard {
-                        DeviceActivityReport(context: .appRanking, filter: filter)
+                        DeviceActivityReport(.appRanking, filter: filter)
                             .frame(minHeight: 400)
                     }
                     .accessibilityLabel("앱별 사용 시간 순위")

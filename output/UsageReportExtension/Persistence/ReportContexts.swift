@@ -1,5 +1,6 @@
 import Foundation
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 import ManagedSettings
 
 // MARK: - Context constants

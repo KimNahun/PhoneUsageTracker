@@ -6,7 +6,7 @@ public struct HistorySummary: Sendable {
         public let date: Date
         public let totalSeconds: Double
 
-        public init(date: Date, totalSeconds: Double) {
+        nonisolated public init(date: Date, totalSeconds: Double) {
             self.id = date
             self.date = date
             self.totalSeconds = totalSeconds
@@ -21,7 +21,7 @@ public struct HistorySummary: Sendable {
 
     public var hasMinimumData: Bool { points.count >= 14 }
 
-    public init(
+    nonisolated public init(
         points: [DailyPoint],
         weekOverWeekDelta: Double?,
         monthOverMonthDelta: Double?,
@@ -35,7 +35,7 @@ public struct HistorySummary: Sendable {
         self.lowestDay = lowestDay
     }
 
-    public static func empty() -> HistorySummary {
+    nonisolated public static func empty() -> HistorySummary {
         HistorySummary(
             points: [],
             weekOverWeekDelta: nil,

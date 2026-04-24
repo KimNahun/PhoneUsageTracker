@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import FamilyControls
 import PersonalColorDesignSystem
 import ManagedSettings
 

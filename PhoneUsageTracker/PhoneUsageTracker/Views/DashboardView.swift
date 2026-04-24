@@ -1,5 +1,6 @@
 import SwiftUI
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 import PersonalColorDesignSystem
 
 struct DashboardView: View {
@@ -62,7 +63,7 @@ struct DashboardView: View {
     private var reportCard: some View {
         if let filter = currentFilter {
             GlassCard {
-                DeviceActivityReport(context: .totalActivity, filter: filter)
+                DeviceActivityReport(.totalActivity, filter: filter)
                     .frame(minHeight: 320)
             }
             .accessibilityLabel("사용 시간 리포트")

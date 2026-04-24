@@ -22,7 +22,7 @@ struct CategoryBreakdownScene: DeviceActivityReportScene {
         for await activityData in data {
             for await activitySegment in activityData.activitySegments {
                 for await categoryActivity in activitySegment.categories {
-                    let token    = categoryActivity.category.token
+                    guard let token = categoryActivity.category.token else { continue }
                     let duration = categoryActivity.totalActivityDuration
                     totalSeconds += duration
                     if let idx = categoryMap.firstIndex(where: { $0.token == token }) {

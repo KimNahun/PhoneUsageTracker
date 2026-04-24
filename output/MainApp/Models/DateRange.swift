@@ -23,7 +23,7 @@ public enum DateRange: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    public func currentInterval(now: Date = .now, calendar: Calendar = .current) -> DateInterval {
+    nonisolated public func currentInterval(now: Date = .now, calendar: Calendar = .current) -> DateInterval {
         switch self {
         case .today:
             let start = calendar.startOfDay(for: now)

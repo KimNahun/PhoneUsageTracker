@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class OnboardingViewModel {
-    private(set) var step: Int = 0
+    var step: Int = 0
     private(set) var isRequesting: Bool = false
     private(set) var result: AuthorizationState?
     private(set) var errorMessage: String?

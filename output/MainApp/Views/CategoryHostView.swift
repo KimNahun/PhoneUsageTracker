@@ -1,5 +1,6 @@
 import SwiftUI
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 import PersonalColorDesignSystem
 
 struct CategoryHostView: View {
@@ -11,7 +12,7 @@ struct CategoryHostView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     GlassCard {
-                        DeviceActivityReport(context: .categoryBreakdown, filter: filter)
+                        DeviceActivityReport(.categoryBreakdown, filter: filter)
                             .frame(minHeight: 360)
                     }
                     .accessibilityLabel("카테고리별 사용 시간 분석")

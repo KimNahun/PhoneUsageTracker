@@ -1,4 +1,5 @@
 import SwiftUI
+import FamilyControls
 import PersonalColorDesignSystem
 import ManagedSettings
 

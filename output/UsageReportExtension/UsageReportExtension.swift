@@ -1,4 +1,5 @@
 import DeviceActivity
+import _DeviceActivity_SwiftUI
 
 @main
 struct UsageReportExtension: DeviceActivityReportExtension {
