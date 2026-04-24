@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */; };
-		DE81DCE5AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE4AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework */; };
+		419739AE2F9B35FA00D1F218 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */; };
+		419739AF2F9B35FA00D1F218 /* DeviceActivity.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DE81DCE42F9A63BE0045FDC5 /* DeviceActivity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DE81DCED2F9A63BE0045FDC5 /* UsageReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DE81DCE22F9A63BE0045FDC5 /* UsageReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DE81DCFE2F9A67880045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFD2F9A67880045FDC5 /* PersonalColorDesignSystem */; };
 		DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = DE81DCFF2F9A69890045FDC5 /* PersonalColorDesignSystem */; };
@@ -25,6 +25,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		419739B02F9B35FA00D1F218 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				419739AF2F9B35FA00D1F218 /* DeviceActivity.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DE81DCF22F9A63BE0045FDC5 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -84,9 +95,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE81DCE52F9A63BE0045FDC5 /* DeviceActivity.framework in Frameworks */,
-				DE81DCE5AAAA0001AAAAAAAA /* _DeviceActivity_SwiftUI.framework in Frameworks */,
 				DE81DD002F9A69890045FDC5 /* PersonalColorDesignSystem in Frameworks */,
+				419739AE2F9B35FA00D1F218 /* DeviceActivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,6 +166,7 @@
 				DE81DCDE2F9A63BE0045FDC5 /* Sources */,
 				DE81DCDF2F9A63BE0045FDC5 /* Frameworks */,
 				DE81DCE02F9A63BE0045FDC5 /* Resources */,
+				419739B02F9B35FA00D1F218 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
