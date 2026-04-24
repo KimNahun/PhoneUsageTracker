@@ -38,13 +38,13 @@ struct AppDetailView: View {
                         .foregroundStyle(Color.pTextTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                Text(formatDuration(configuration.totalSeconds))
+                Text(DurationFormatter.format(configuration.totalSeconds))
                     .font(.pDisplay(28))
                     .foregroundStyle(Color.pTextPrimary)
             }
             .padding(16)
         }
-        .accessibilityLabel("앱 총 사용 시간 \(formatDuration(configuration.totalSeconds))")
+        .accessibilityLabel("앱 총 사용 시간 \(DurationFormatter.format(configuration.totalSeconds))")
     }
 
     private var chartCard: some View {
@@ -97,7 +97,7 @@ struct AppDetailView: View {
         GlassCard {
             VStack(spacing: 12) {
                 Image(systemName: "chart.bar")
-                    .font(.system(size: 36))
+                    .font(.pDisplay(36))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("데이터가 없습니다")
@@ -119,10 +119,4 @@ struct AppDetailView: View {
         return "\(hour)시 사용 시간 \(Int(bucket.totalSeconds / 60))분"
     }
 
-    private func formatDuration(_ seconds: Double) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        if h > 0 { return "\(h)시간 \(m)분" }
-        return "\(m)분"
-    }
 }

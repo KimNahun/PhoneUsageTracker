@@ -18,13 +18,21 @@ struct HourlyHeatmapView: View {
                 contentView
             }
         }
+        .sheet(item: Binding(
+            get: { viewModel.selectedCell },
+            set: { viewModel.selectCell($0) }
+        )) { cell in
+            detailSheet(cell: cell)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
     }
 
     private var emptyView: some View {
         GlassCard {
             VStack(spacing: 12) {
                 Image(systemName: "grid")
-                    .font(.system(size: 40))
+                    .font(.pDisplay(40))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("히트맵 데이터가 없습니다")
@@ -44,9 +52,6 @@ struct HourlyHeatmapView: View {
                 if let peak = viewModel.peak, peak.seconds > 0 {
                     insightCard(peak: peak)
                 }
-                if viewModel.selectedCell != nil {
-                    detailSheet
-                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -56,7 +61,7 @@ struct HourlyHeatmapView: View {
     private var heatmapCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 8) {
-                Text("요일 × 시간대 사용 패턴")
+                Text("요일 x 시간대 사용 패턴")
                     .font(.pTitle(14))
                     .foregroundStyle(Color.pTextPrimary)
                     .padding(.top, 12)
@@ -75,6 +80,24 @@ struct HourlyHeatmapView: View {
                         .accessibilityLabel(
                             "\(weekdayLabel(cell.weekday)) \(cell.hour)시 사용 시간 \(Int(cell.seconds / 60))분"
                         )
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { geo in
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .onTapGesture { location in
+                                    guard let hourValue: Int = proxy.value(atX: location.x),
+                                          let weekdayLabel: String = proxy.value(atY: location.y) else { return }
+                                    // Map weekday label back to weekday index
+                                    if let matchedCell = viewModel.cells.first(where: {
+                                        $0.hour == hourValue && self.weekdayLabel($0.weekday) == weekdayLabel
+                                    }) {
+                                        HapticManager.impact(.light)
+                                        viewModel.selectCell(matchedCell)
+                                    }
+                                }
+                        }
                     }
                     .chartXAxis {
                         AxisMarks(values: [0, 6, 12, 18, 23]) { value in
@@ -105,7 +128,7 @@ struct HourlyHeatmapView: View {
                 .padding(.bottom, 12)
             }
         }
-        .accessibilityLabel("요일별 시간대 사용 히트맵")
+        .accessibilityLabel("요일별 시간대 사용 히트맵. 셀을 탭하면 상세 정보를 볼 수 있습니다.")
     }
 
     private func insightCard(peak: HeatmapCell) -> some View {
@@ -128,28 +151,24 @@ struct HourlyHeatmapView: View {
         .accessibilityLabel("가장 많이 쓰는 시간: \(weekdayLabel(peak.weekday)) \(peak.hour)시, \(Int(peak.seconds / 60))분")
     }
 
-    @ViewBuilder
-    private var detailSheet: some View {
-        if let cell = viewModel.selectedCell {
+    private func detailSheet(cell: HeatmapCell) -> some View {
+        ZStack {
+            PGradientBackground()
             GlassCard {
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     Text("\(weekdayLabel(cell.weekday)) \(cell.hour)시 상세")
-                        .font(.pTitle(14))
+                        .font(.pTitle(16))
                         .foregroundStyle(Color.pTextPrimary)
-                    Text(formatDuration(cell.seconds))
-                        .font(.pDisplay(32))
+                    Text(DurationFormatter.format(cell.seconds))
+                        .font(.pDisplay(36))
                         .foregroundStyle(Color.pTextPrimary)
-                    Button("닫기") {
-                        HapticManager.impact(.light)
-                        viewModel.selectCell(nil)
-                    }
-                    .font(.pBody(14))
-                    .foregroundStyle(Color.pAccentPrimary)
-                    .frame(minHeight: 44)
-                    .accessibilityLabel("상세 정보 닫기")
+                    Text("이 시간대의 총 사용 시간입니다.")
+                        .font(.pBody(14))
+                        .foregroundStyle(Color.pTextSecondary)
                 }
-                .padding(16)
+                .padding(24)
             }
+            .padding(24)
         }
     }
 
@@ -157,12 +176,5 @@ struct HourlyHeatmapView: View {
         let labels = ["일", "월", "화", "수", "목", "금", "토"]
         let idx = max(0, min(weekday - 1, 6))
         return labels[idx]
-    }
-
-    private func formatDuration(_ seconds: Double) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        if h > 0 { return "\(h)시간 \(m)분" }
-        return "\(m)분"
     }
 }

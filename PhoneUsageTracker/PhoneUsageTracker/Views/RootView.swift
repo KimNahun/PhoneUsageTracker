@@ -18,7 +18,7 @@ struct RootView: View {
                 .transition(.opacity)
             case .denied:
                 PermissionDeniedView(
-                    authService: dependencies.authorizationService,
+                    viewModel: PermissionDeniedViewModel(authService: dependencies.authorizationService),
                     onRetrySuccess: {
                         authorization = .approved
                     }

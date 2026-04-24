@@ -3,10 +3,13 @@ import UIKit
 import PersonalColorDesignSystem
 
 struct PermissionDeniedView: View {
-    let authService: any AuthorizationServiceProtocol
+    @State private var viewModel: PermissionDeniedViewModel
     let onRetrySuccess: () -> Void
 
-    @State private var isRetrying = false
+    init(viewModel: PermissionDeniedViewModel, onRetrySuccess: @escaping () -> Void) {
+        self._viewModel = State(initialValue: viewModel)
+        self.onRetrySuccess = onRetrySuccess
+    }
 
     var body: some View {
         ZStack {
@@ -14,7 +17,7 @@ struct PermissionDeniedView: View {
             GlassCard {
                 VStack(spacing: 24) {
                     Image(systemName: "xmark.shield.fill")
-                        .font(.system(size: 64))
+                        .font(.pDisplay(64))
                         .foregroundStyle(Color.pDestructive)
                         .accessibilityHidden(true)
                     Text("권한 없이는 분석할 수 없어요")
@@ -28,8 +31,11 @@ struct PermissionDeniedView: View {
                     VStack(spacing: 12) {
                         Button("설정 열기") {
                             HapticManager.impact(.light)
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
+                            Task {
+                                let urlString = await viewModel.openSettingsURLString()
+                                if let url = URL(string: urlString) {
+                                    await UIApplication.shared.open(url)
+                                }
                             }
                         }
                         .buttonStyle(PrimaryButtonStyle())
@@ -37,9 +43,9 @@ struct PermissionDeniedView: View {
 
                         Button(action: {
                             HapticManager.impact(.light)
-                            Task { await retry() }
+                            Task { await viewModel.retry() }
                         }) {
-                            if isRetrying {
+                            if viewModel.isRetrying {
                                 ProgressView()
                                     .tint(Color.pTextPrimary)
                                     .frame(maxWidth: .infinity)
@@ -51,7 +57,7 @@ struct PermissionDeniedView: View {
                             }
                         }
                         .buttonStyle(SecondaryButtonStyle())
-                        .disabled(isRetrying)
+                        .disabled(viewModel.isRetrying)
                         .accessibilityLabel("권한 다시 요청하기")
                     }
                 }
@@ -59,14 +65,10 @@ struct PermissionDeniedView: View {
             }
             .padding(24)
         }
-    }
-
-    private func retry() async {
-        isRetrying = true
-        defer { isRetrying = false }
-        let state = await authService.requestAuthorization()
-        if state == .approved {
-            onRetrySuccess()
+        .onChange(of: viewModel.result) { _, newValue in
+            if newValue == .approved {
+                onRetrySuccess()
+            }
         }
     }
 }

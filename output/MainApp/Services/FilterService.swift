@@ -2,7 +2,7 @@ import Foundation
 import DeviceActivity
 import os
 
-actor FilterService: FilterServiceProtocol {
+struct FilterService: FilterServiceProtocol {
     func buildFilter(for range: DateRange, now: Date) async -> DeviceActivityFilter {
         let interval = range.currentInterval(now: now)
         Logger.filter.info("buildFilter: range=\(range.rawValue) interval=\(interval.duration)s")

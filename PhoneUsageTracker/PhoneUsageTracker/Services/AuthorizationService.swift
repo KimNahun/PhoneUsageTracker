@@ -22,7 +22,7 @@ actor AuthorizationService: AuthorizationServiceProtocol {
         }
     }
 
-    nonisolated func openSettingsURLString() -> String {
+    func openSettingsURLString() -> String {
         UIApplication.openSettingsURLString
     }
 

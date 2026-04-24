@@ -2,15 +2,15 @@ import Foundation
 import DeviceActivity
 import os
 
-actor FilterService: FilterServiceProtocol {
-    nonisolated func buildFilter(for range: DateRange, now: Date) -> DeviceActivityFilter {
+struct FilterService: FilterServiceProtocol {
+    func buildFilter(for range: DateRange, now: Date) async -> DeviceActivityFilter {
         let interval = range.currentInterval(now: now)
         Logger.filter.info("buildFilter: range=\(range.rawValue) interval=\(interval.duration)s")
 
         switch range {
         case .today:
             return DeviceActivityFilter(
-                segment: .daily(during: interval),
+                segment: .hourly(during: interval),
                 users: .all,
                 devices: .init([.iPhone])
             )

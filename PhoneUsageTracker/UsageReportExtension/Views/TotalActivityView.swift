@@ -24,7 +24,7 @@ struct TotalActivityView: View {
         GlassCard {
             VStack(spacing: 12) {
                 Image(systemName: "hourglass")
-                    .font(.system(size: 40))
+                    .font(.pDisplay(40))
                     .foregroundStyle(Color.pTextTertiary)
                     .accessibilityHidden(true)
                 Text("데이터 수집 중")
@@ -58,13 +58,13 @@ struct TotalActivityView: View {
                 Text("총 사용 시간")
                     .font(.pCaption(12))
                     .foregroundStyle(Color.pTextTertiary)
-                Text(formatDuration(viewModel.totalSeconds))
+                Text(DurationFormatter.format(viewModel.totalSeconds))
                     .font(.pDisplay(48))
                     .foregroundStyle(Color.pTextPrimary)
             }
             .padding(20)
         }
-        .accessibilityLabel("총 사용 시간 \(formatDuration(viewModel.totalSeconds))")
+        .accessibilityLabel("총 사용 시간 \(DurationFormatter.format(viewModel.totalSeconds))")
     }
 
     private var barChartCard: some View {
@@ -144,8 +144,8 @@ struct TotalActivityView: View {
                 statItem(
                     icon: "hand.tap.fill",
                     title: "픽업",
-                    value: "\(viewModel.pickupCount)회",
-                    accessibilityValue: "픽업 횟수 \(viewModel.pickupCount)회"
+                    value: viewModel.pickupCount.map { "\($0)회" } ?? "미지원",
+                    accessibilityValue: viewModel.pickupCount.map { "픽업 횟수 \($0)회" } ?? "픽업 횟수 미지원"
                 )
                 Rectangle()
                     .fill(Color.pGlassBorder)
@@ -153,8 +153,8 @@ struct TotalActivityView: View {
                 statItem(
                     icon: "bell.fill",
                     title: "알림",
-                    value: "\(viewModel.notificationCount)회",
-                    accessibilityValue: "알림 횟수 \(viewModel.notificationCount)회"
+                    value: viewModel.notificationCount.map { "\($0)회" } ?? "미지원",
+                    accessibilityValue: viewModel.notificationCount.map { "알림 횟수 \($0)회" } ?? "알림 횟수 미지원"
                 )
             }
             .padding(16)
@@ -177,10 +177,4 @@ struct TotalActivityView: View {
         .accessibilityLabel(accessibilityValue)
     }
 
-    private func formatDuration(_ seconds: Double) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        if h > 0 { return "\(h)시간 \(m)분" }
-        return "\(m)분"
-    }
 }

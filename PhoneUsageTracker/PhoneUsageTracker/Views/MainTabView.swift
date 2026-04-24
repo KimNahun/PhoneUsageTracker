@@ -5,7 +5,6 @@ import PersonalColorDesignSystem
 struct MainTabView: View {
     let dependencies: DependencyContainer
     @State private var dashboardVM: DashboardViewModel
-    @State private var currentFilter: DeviceActivityFilter?
 
     init(dependencies: DependencyContainer) {
         self.dependencies = dependencies
@@ -18,10 +17,7 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                DashboardView(
-                    viewModel: dashboardVM,
-                    filterService: dependencies.filterService
-                )
+                DashboardView(viewModel: dashboardVM)
             }
             .tabItem { Label("대시보드", systemImage: "chart.bar.fill") }
             .accessibilityLabel("대시보드 탭")
@@ -55,23 +51,11 @@ struct MainTabView: View {
             .accessibilityLabel("설정 탭")
         }
         .tint(Color.pAccentPrimary)
-        .task {
-            // Eagerly build filter for other tabs
-            currentFilter = await dependencies.filterService.buildFilter(
-                for: dashboardVM.selectedRange,
-                now: .now
-            )
-        }
-        .onChange(of: dashboardVM.selectedRange) { _, range in
-            Task {
-                currentFilter = await dependencies.filterService.buildFilter(for: range, now: .now)
-            }
-        }
     }
 
     @ViewBuilder
     private var appRankingTab: some View {
-        if let filter = currentFilter {
+        if let filter = dashboardVM.currentFilter {
             AppRankingHostView(filter: filter)
         } else {
             placeholderView(title: "앱 순위", message: "대시보드에서 기간을 선택해 주세요.")
@@ -80,7 +64,7 @@ struct MainTabView: View {
 
     @ViewBuilder
     private var categoryTab: some View {
-        if let filter = currentFilter {
+        if let filter = dashboardVM.currentFilter {
             CategoryHostView(filter: filter)
         } else {
             placeholderView(title: "카테고리 분석", message: "대시보드에서 기간을 선택해 주세요.")
@@ -93,7 +77,7 @@ struct MainTabView: View {
             GlassCard {
                 VStack(spacing: 12) {
                     Image(systemName: "hourglass")
-                        .font(.system(size: 40))
+                        .font(.pDisplay(40))
                         .foregroundStyle(Color.pTextTertiary)
                         .accessibilityHidden(true)
                     Text(message)

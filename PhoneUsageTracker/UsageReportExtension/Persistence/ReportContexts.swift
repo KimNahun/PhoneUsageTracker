@@ -36,8 +36,8 @@ public struct TotalActivityConfiguration: Sendable {
     public let totalSeconds: Double
     public let buckets: [BucketPoint]
     public let segmentKind: SegmentKind
-    public let pickupCount: Int
-    public let notificationCount: Int
+    public let pickupCount: Int?
+    public let notificationCount: Int?
     public let isEmpty: Bool
 
     public static var empty: TotalActivityConfiguration {
@@ -45,8 +45,8 @@ public struct TotalActivityConfiguration: Sendable {
             totalSeconds: 0,
             buckets: [],
             segmentKind: .hourly,
-            pickupCount: 0,
-            notificationCount: 0,
+            pickupCount: nil,
+            notificationCount: nil,
             isEmpty: true
         )
     }

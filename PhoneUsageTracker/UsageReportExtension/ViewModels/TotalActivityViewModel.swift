@@ -7,8 +7,8 @@ final class TotalActivityViewModel {
     private(set) var totalSeconds: Double = 0
     private(set) var buckets: [BucketPoint] = []
     private(set) var segmentKind: SegmentKind = .hourly
-    private(set) var pickupCount: Int = 0
-    private(set) var notificationCount: Int = 0
+    private(set) var pickupCount: Int?
+    private(set) var notificationCount: Int?
     private(set) var isEmpty: Bool = true
 
     init(configuration: TotalActivityConfiguration? = nil) {
